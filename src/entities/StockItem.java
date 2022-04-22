@@ -15,17 +15,19 @@ public class StockItem {
 	private String manufacturer;
 	private int price;
 	private String category;
+	private int quanitity;
 	//Associated image
 	
 	public StockItem() {
 		
 	}
 	
-	public StockItem(String title, String manufacturer, int price, String category) {
+	public StockItem(String title, int price, String category, String manufacturer) {
 		this.title = title;
 		this.manufacturer = manufacturer;
 		this.price = price;
 		this.category = category;
+		this.quanitity = 0;
 	}
 	
 	
@@ -54,4 +56,21 @@ public class StockItem {
 	public void setCategory(String category) {
 		this.category = category;
 	}
+
+	public int getStockItemID() {
+		return stockItemID;
+	}
+
+	public void setStockItemID(int stockItemID) {
+		this.stockItemID = stockItemID;
+	}
+
+	public int getQuanitity() {
+		return quanitity;
+	}
+
+	public void setQuanitity(int quanitity) {
+		this.quanitity = quanitity;
+	}
+	
 }
