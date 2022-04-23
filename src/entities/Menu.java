@@ -11,6 +11,7 @@ import java.text.SimpleDateFormat;
 
 import javax.swing.text.MaskFormatter;
 
+import DAOs.CustomerDAO;
 import DAOs.StockDAO;
 
 import java.util.ArrayList;
@@ -21,8 +22,8 @@ import java.util.Date;
 
 public class Menu extends JFrame {
 
-	//private ArrayList<Customer> customerList = new ArrayList<Customer>();
-	CustomerList customerList = new CustomerList();
+
+	ArrayList<Customer> customerList = new ArrayList<Customer>();
 	ArrayList<StockItem> stockList = new ArrayList<>();
 	private int position = 0;
 	private String password;
@@ -34,7 +35,7 @@ public class Menu extends JFrame {
 	JLabel	stockIDLabel,stockNameLabel, stockPriceLabel, stockQuantityLabel, stockCategoryLabel, stockManufacturerLabel;
 	JTextField stockIDText, stockNameText, stockPriceText, stockQuantityText, stockCategoryText, stockManufacturerText;
 	JLabel customerIDLabel, passwordLabel;
-	JTextField customerIDTextField, passwordTextField;
+	JTextField customerIDText, passwordText;
 	Container content;
 	Customer loggedInCustomer;
 
@@ -135,7 +136,7 @@ public class Menu extends JFrame {
 							address = addressText.getText();
 							password = "";
 
-							CustomerID = "ID" + firstName;
+
 
 							add.addActionListener(new ActionListener() {
 								public void actionPerformed(ActionEvent e) {
@@ -154,11 +155,11 @@ public class Menu extends JFrame {
 										}
 									}
 
-									ArrayList<CustomerAccount> accounts = new ArrayList<CustomerAccount>();
-									Customer customer = new Customer(firstName,surname,  address, CustomerID, password,
-											accounts);
 
-									customerList.getCustomerList().add(customer);
+								
+
+									CustomerDAO customerDAO = new CustomerDAO();
+									customerDAO.persistObject(new Customer(firstName,surname,  address,password));
 
 									JOptionPane.showMessageDialog(f,
 											"CustomerID = " + CustomerID + "\n Password = " + password,
@@ -424,7 +425,7 @@ public class Menu extends JFrame {
 				save = new JButton("Save");
 				cancel = new JButton("Cancel");
 
-				displayUserInfo(stockList,0);
+				displayStockInfo(stockList,0);
 				
 				stockIDText.setEditable(false);
 				stockNameText.setEditable(false);
@@ -459,7 +460,7 @@ public class Menu extends JFrame {
 				first.addActionListener(new ActionListener() {
 					public void actionPerformed(ActionEvent ae) {
 						position = 0;
-						displayUserInfo(stockList, position);
+						displayStockInfo(stockList, position);
 					}
 				});
 				
@@ -471,7 +472,7 @@ public class Menu extends JFrame {
 						} else {
 							position = position - 1;
 
-							displayUserInfo(stockList, position);
+							displayStockInfo(stockList, position);
 						}
 					}
 				});
@@ -484,7 +485,7 @@ public class Menu extends JFrame {
 						} else {
 							position = position + 1;
 
-							displayUserInfo(stockList, position);
+							displayStockInfo(stockList, position);
 						}
 
 					}
@@ -495,7 +496,7 @@ public class Menu extends JFrame {
 
 						position = stockList.size() - 1;
 
-						displayUserInfo(stockList, position);
+						displayStockInfo(stockList, position);
 					}
 				});
 				
@@ -543,7 +544,7 @@ public class Menu extends JFrame {
 		
 		addStockButton.addActionListener(new ActionListener() {
 			public void actionPerformed(ActionEvent ae) {
-
+				
 			}
 		});
 		
@@ -555,6 +556,127 @@ public class Menu extends JFrame {
 		
 		viewCustomersButton.addActionListener(new ActionListener() {
 			public void actionPerformed(ActionEvent ae) {
+				
+				CustomerDAO customerDAO = new CustomerDAO();
+				customerList = customerDAO.getAllCustomers();
+				f.dispose();
+				
+				JButton first, previous, next, last, cancel, edit, save;
+				JPanel gridPanel, buttonPanel, actionPanel;
+
+				Container content = getContentPane();
+
+				content.setLayout(new BorderLayout());
+
+				buttonPanel = new JPanel();
+				gridPanel = new JPanel(new GridLayout(8, 2));
+				actionPanel = new JPanel();
+				
+				customerIDLabel = new JLabel("ID:", SwingConstants.LEFT);
+				firstNameLabel = new JLabel("First Name:", SwingConstants.LEFT);
+				surnameLabel = new JLabel("Surname:", SwingConstants.LEFT);
+				addressLabel = new JLabel("Address:", SwingConstants.LEFT);
+
+				
+				customerIDText = new JTextField(20);
+				firstNameText = new JTextField(20);
+				surnameText = new JTextField(20);
+				addressText = new JTextField(20);
+	
+				first = new JButton("First");
+				previous = new JButton("Previous");
+				next = new JButton("Next");
+				last = new JButton("Last");
+				
+
+				cancel = new JButton("Cancel");
+
+				displayCustomerInfo(customerList, 0);
+				
+				customerIDText.setEditable(false);
+				firstNameText.setEditable(false);
+				surnameText.setEditable(false);
+				addressText.setEditable(false);
+
+				
+				gridPanel.add(customerIDLabel);
+				gridPanel.add(customerIDText);
+				gridPanel.add(firstNameLabel);
+				gridPanel.add(firstNameText);
+				gridPanel.add(surnameLabel);
+				gridPanel.add(surnameText);
+				gridPanel.add(addressLabel);
+				gridPanel.add(addressText);
+
+				
+				buttonPanel.add(first);
+				buttonPanel.add(previous);
+				buttonPanel.add(next);
+				buttonPanel.add(last);
+
+				actionPanel.add(cancel);
+				
+				
+				content.add(gridPanel, BorderLayout.NORTH);
+				content.add(buttonPanel, BorderLayout.CENTER);
+				content.add(actionPanel, BorderLayout.AFTER_LAST_LINE);
+				first.addActionListener(new ActionListener() {
+					public void actionPerformed(ActionEvent ae) {
+						position = 0;
+						displayCustomerInfo(customerList, position);
+					}
+				});
+				
+				previous.addActionListener(new ActionListener() {
+					public void actionPerformed(ActionEvent ae) {
+
+						if (position < 1) {
+							// don't do anything
+						} else {
+							position = position - 1;
+
+							displayCustomerInfo(customerList, position);
+						}
+					}
+				});
+
+				next.addActionListener(new ActionListener() {
+					public void actionPerformed(ActionEvent ae) {
+
+						if (position == stockList.size() - 1) {
+							// don't do anything
+						} else {
+							position = position + 1;
+
+							displayCustomerInfo(customerList, position);
+						}
+
+					}
+				});
+
+				last.addActionListener(new ActionListener() {
+					public void actionPerformed(ActionEvent ae) {
+
+						position = stockList.size() - 1;
+
+						displayCustomerInfo(customerList, position);
+					}
+				});
+				
+
+
+				cancel.addActionListener(new ActionListener() {
+					public void actionPerformed(ActionEvent ae) {
+						dispose();
+						admin();
+					}
+				});
+				setContentPane(content);
+				setSize(400, 300);
+				setVisible(true);
+			
+				
+				
 
 			}
 		});
@@ -568,13 +690,20 @@ public class Menu extends JFrame {
 		});
 	}
 	
-	public void displayUserInfo(ArrayList<StockItem> stockList, int position) {
+	public void displayStockInfo(ArrayList<StockItem> stockList, int position) {
 		stockIDText.setText(String.valueOf(stockList.get(position).getStockItemID()));
 		stockNameText.setText(stockList.get(position).getTitle());
 		stockPriceText.setText(String.valueOf(stockList.get(position).getPrice()));
 		stockCategoryText.setText(stockList.get(position).getCategory());
 		stockManufacturerText.setText(stockList.get(position).getManufacturer());
 		
+	}
+	
+	public void displayCustomerInfo(ArrayList<Customer> customerList, int postition) {
+		customerIDText.setText(String.valueOf(customerList.get(postition).getCustomerID()));
+		firstNameText.setText(customerList.get(postition).getFirstName());
+		surnameText.setText(customerList.get(postition).getSurname());
+		addressText.setText(customerList.get(postition).getAddress());
 	}
 	
 }

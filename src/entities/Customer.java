@@ -2,37 +2,37 @@ package entities;
 
 import java.util.ArrayList;
 
+import javax.persistence.Entity;
+import javax.persistence.GeneratedValue;
+import javax.persistence.GenerationType;
+import javax.persistence.Id;
+
+@Entity
 public class Customer {
-	String firstName = "";
-	String surname = "";
-	String address = "";
-	String customerID = "";
-	String password = "";
 	
-	ArrayList<CustomerAccount> accounts = new ArrayList<CustomerAccount> ();
+	@Id
+	@GeneratedValue(strategy=GenerationType.IDENTITY)
+	private int customerID;
+	private String firstName;
+	private String surname;
+	private String address;
+	private String password;
+	
+	
+
 
 	//Blank constructor
-	public Customer()
-	{
-		this.firstName = "";
-		this.surname = "";
-		this.address = "";
-		this.customerID = "";
-		this.password = "";
-		this.accounts = null;
-
+	public Customer(){
 	}
 	
 	//Constructor with details
-	public Customer(String firstName, String surname, String address, String customerID, String password, ArrayList<CustomerAccount> accounts)
+	public Customer(String firstName, String surname, String address, String password)
 	{
-
-		this.surname = surname;
 		this.firstName = firstName;
+		this.surname = surname;
 		this.address = address;
-		this.customerID = customerID;
 		this.password = password;
-		this.accounts = accounts;
+
 	}
 	
 	
@@ -61,11 +61,11 @@ public class Customer {
 		this.address = address;
 	}
 
-	public String getCustomerID() {
+	public int getCustomerID() {
 		return customerID;
 	}
 
-	public void setCustomerID(String customerID) {
+	public void setCustomerID(int customerID) {
 		this.customerID = customerID;
 	}
 
@@ -78,14 +78,6 @@ public class Customer {
 	}
 	
 	
-
-	public ArrayList<CustomerAccount> getAccounts() {
-		return accounts;
-	}
-
-	public void setAccounts(ArrayList<CustomerAccount> accounts) {
-		this.accounts = accounts;
-	}
 
 	public String toString()
 	{

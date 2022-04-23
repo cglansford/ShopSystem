@@ -27,7 +27,7 @@ public class StockItem {
 		this.manufacturer = manufacturer;
 		this.price = price;
 		this.category = category;
-		this.quanitity = 0;
+		this.quanitity = 10;
 	}
 	
 	
@@ -71,6 +71,14 @@ public class StockItem {
 
 	public void setQuanitity(int quanitity) {
 		this.quanitity = quanitity;
+	}
+	
+	public void buyStock() {
+		
+	}
+	
+	public void sellStock() {
+		
 	}
 	
 }

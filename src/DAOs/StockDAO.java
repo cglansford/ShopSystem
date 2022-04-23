@@ -46,6 +46,7 @@ public class StockDAO {
         managedEntity.setTitle(name);
         managedEntity.setPrice(price);
         managedEntity.setCategory(category);
+        System.out.print(category);
         managedEntity.setManufacturer(manufacturer);
         em.flush();
         em.getTransaction().commit();
