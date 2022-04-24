@@ -993,6 +993,121 @@ public class Menu extends JFrame {
 			
 		});
 		
+	
+		searchStockButton.addActionListener(new ActionListener() {
+			public void actionPerformed(ActionEvent ae) {
+				boolean stockItemNotFound = true;
+				StockItem aStockItem = null;
+				StockDAO stockDAO = new StockDAO();
+				//Looking for Stock Item in DB
+				while (stockItemNotFound) {
+					String stockName = JOptionPane.showInputDialog(f, "Enter Stock Name:");
+
+					aStockItem = stockDAO.searchStockByName(stockName);
+
+					if (aStockItem == null) {
+						int reply = JOptionPane.showConfirmDialog(null, null, "Stock Item not found. Try again?",
+								JOptionPane.YES_NO_OPTION);
+						if (reply == JOptionPane.YES_OPTION) {
+							stockItemNotFound = true;
+						} else if (reply == JOptionPane.NO_OPTION) {
+							f.dispose();
+							stockItemNotFound = false;
+							
+							menuStart();
+						}
+					} else {
+						stockItemNotFound = false;
+					}
+
+				}
+				
+				f.dispose();
+				
+				JButton cancel;
+				JPanel gridPanel, actionPanel;
+
+				f = new JFrame("View All Stock");
+				f.setSize(400, 400);
+				f.setLocation(200, 200);
+				f.addWindowListener(new WindowAdapter() {
+					public void windowClosing(WindowEvent we) {
+						System.exit(0);
+					}
+				});
+				f.setVisible(true);
+				
+				Container content = f.getContentPane();
+				content.setLayout(new BorderLayout());
+
+				
+				gridPanel = new JPanel(new GridLayout(12, 2));
+				actionPanel = new JPanel();
+				
+				stockIDLabel = new JLabel("ID:", SwingConstants.LEFT);
+				stockNameLabel = new JLabel("Title:", SwingConstants.LEFT);
+				stockPriceLabel = new JLabel("Price:", SwingConstants.LEFT);
+				stockCategoryLabel = new JLabel("Category:", SwingConstants.LEFT);
+				stockManufacturerLabel = new JLabel("Manufacturer", SwingConstants.LEFT);
+				stockQuantityLabel = new JLabel("Quantity", SwingConstants.LEFT);
+				
+				stockIDText = new JTextField(20);
+				stockNameText = new JTextField(20);
+				stockPriceText = new JTextField(20);
+				stockCategoryText = new JTextField(20);
+				stockManufacturerText = new JTextField(20);
+				stockQuantityText = new JTextField(20);
+				
+				stockIDText.setText(String.valueOf(aStockItem.getStockItemID()));
+				stockNameText.setText(aStockItem.getTitle());
+				stockPriceText.setText(String.valueOf(aStockItem.getPrice()));
+				stockCategoryText.setText(aStockItem.getCategory());
+				stockManufacturerText.setText(aStockItem.getManufacturer());
+				stockQuantityText.setText(String.valueOf(aStockItem.getQuantity()));
+				
+				cancel = new JButton("Cancel");
+				
+				stockIDText.setEditable(false);
+				stockNameText.setEditable(false);
+				stockPriceText.setEditable(false);
+				stockCategoryText.setEditable(false);
+				stockManufacturerText.setEditable(false);
+				stockQuantityText.setEditable(false);
+				
+				gridPanel.add(stockIDLabel);
+				gridPanel.add(stockIDText);
+				gridPanel.add(stockNameLabel);
+				gridPanel.add(stockNameText);
+				gridPanel.add(stockPriceLabel);
+				gridPanel.add(stockPriceText);
+				gridPanel.add(stockCategoryLabel);
+				gridPanel.add(stockCategoryText);
+				gridPanel.add(stockManufacturerLabel);
+				gridPanel.add(stockManufacturerText);
+				gridPanel.add(stockQuantityLabel);
+				gridPanel.add(stockQuantityText);
+				
+				actionPanel.add(cancel);
+				
+				content.add(gridPanel, BorderLayout.NORTH);
+				content.add(actionPanel, BorderLayout.AFTER_LAST_LINE);
+				
+				cancel.addActionListener(new ActionListener() {
+					public void actionPerformed(ActionEvent ae) {
+						f.dispose();
+						customer(aCustomer);
+					}
+				});
+				
+			}
+		});
+		
+		returnButton.addActionListener(new ActionListener() {
+			public void actionPerformed(ActionEvent ae) {
+				f.dispose();
+				menuStart();
+			}
+		});
 	}
 	
 	public void displayStockInfo(ArrayList<StockItem> stockList, int position) {

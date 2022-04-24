@@ -51,6 +51,18 @@ public class StockDAO {
         return managedEntity;
 	}
 	
+	public StockItem searchStockByName(String stockName) {
+		EntityManager em = emf.createEntityManager();
+        em.getTransaction().begin();
+        StockItem managedEntity = em.createQuery("SELECT s FROM StockItem s WHERE s.title = :title",
+        					StockItem.class).setParameter("title", stockName).getSingleResult();
+        em.flush();
+        em.getTransaction().commit();
+       
+        em.close();
+        return managedEntity;
+	}
+	
 	public void updateItem(int stockItemID, String name, int price, String category, String manufacturer) {
 		EntityManager em = emf.createEntityManager();
         em.getTransaction().begin();
