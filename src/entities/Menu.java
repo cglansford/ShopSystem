@@ -30,12 +30,12 @@ public class Menu extends JFrame {
 	private Customer editCustomer = null;
 	
 	JFrame f, f1;
-	JLabel firstNameLabel, surnameLabel, addressLabel;
-	JTextField firstNameText, surnameText, addressText;
+
+	
 	JLabel	stockIDLabel,stockNameLabel, stockPriceLabel, stockQuantityLabel, stockCategoryLabel, stockManufacturerLabel;
 	JTextField stockIDText, stockNameText, stockPriceText, stockQuantityText, stockCategoryText, stockManufacturerText;
-	JLabel customerIDLabel, passwordLabel;
-	JTextField customerIDText, passwordText;
+	JLabel customerIDLabel, passwordLabel, firstNameLabel, surnameLabel, addressLabel;
+	JTextField customerIDText, passwordText, firstNameText, surnameText, addressText;
 	Container content;
 	Customer loggedInCustomer;
 
@@ -68,12 +68,12 @@ public class Menu extends JFrame {
 		JPanel userTypePanel = new JPanel();
 		final ButtonGroup userType = new ButtonGroup();
 		JRadioButton radioButton;
-		userTypePanel.add(radioButton = new JRadioButton("Existing Customer"));
-		radioButton.setActionCommand("Customer");
+		userTypePanel.add(radioButton = new JRadioButton("Customer Login"));
+		radioButton.setActionCommand("Customer Login");
 		userType.add(radioButton);
 
-		userTypePanel.add(radioButton = new JRadioButton("Administrator"));
-		radioButton.setActionCommand("Administrator");
+		userTypePanel.add(radioButton = new JRadioButton("Admin Login"));
+		radioButton.setActionCommand("Admin Login");
 		userType.add(radioButton);
 
 		userTypePanel.add(radioButton = new JRadioButton("New Customer"));
@@ -188,11 +188,67 @@ public class Menu extends JFrame {
 					f1.setVisible(true);
 
 				}
+				
+				// ----------------------------------------------------------------------------------------------------------------
+
+				// if user selects CUSTOMER
+				// ----------------------------------------------------------------------------------------
+				if (user.equals("Customer Login")) {
+					boolean userNotFound = true, inCorrectPassword = true;
+					Customer aCustomer = null;
+					CustomerDAO customerDAO = new CustomerDAO();
+					while (userNotFound) {
+						String customerID = JOptionPane.showInputDialog(f, "Enter Customer ID:");
+
+						 aCustomer = customerDAO.getSingleCustomer(Integer.parseInt(customerID));
+
+						if (aCustomer == null) {
+							int reply = JOptionPane.showConfirmDialog(null, null, "User not found. Try again?",
+									JOptionPane.YES_NO_OPTION);
+							if (reply == JOptionPane.YES_OPTION) {
+								userNotFound = true;
+							} else if (reply == JOptionPane.NO_OPTION) {
+								f.dispose();
+								userNotFound = false;
+								inCorrectPassword = false;
+								menuStart();
+							}
+						} else {
+							userNotFound = false;
+						}
+
+					}
+
+					while (inCorrectPassword) {
+						Object customerPassword = JOptionPane.showInputDialog(f, "Enter Customer Password;");
+
+						if (!aCustomer.getPassword().equals(customerPassword))// check if custoemr password is correct
+						{
+							int reply = JOptionPane.showConfirmDialog(null, null, "Incorrect password. Try again?",
+									JOptionPane.YES_NO_OPTION);
+							if (reply == JOptionPane.YES_OPTION) {
+
+							} else if (reply == JOptionPane.NO_OPTION) {
+								f.dispose();
+								inCorrectPassword = false;
+								menuStart();
+							}
+						} else {
+							inCorrectPassword = false;
+							
+							f.dispose();
+							userNotFound = false;
+							customer(aCustomer);
+						}
+					}
+					
+				}
+				// -----------------------------------------------------------------------------------------------------------------------
 
 				// ------------------------------------------------------------------------------------------------------------------
 				// if user select
 				// ADMIN----------------------------------------------------------------------------------------------
-				if (user.equals("Administrator")) {
+				if (user.equals("Admin Login")) {
 					f.dispose();
 					boolean loop = true, loop2 = true;
 					boolean cont = false;
@@ -396,12 +452,21 @@ public class Menu extends JFrame {
 				JButton first, previous, next, last, cancel, edit, save;
 				JPanel gridPanel, buttonPanel, actionPanel;
 
-				Container content = getContentPane();
-
+				f = new JFrame("View All Stock");
+				f.setSize(400, 400);
+				f.setLocation(200, 200);
+				f.addWindowListener(new WindowAdapter() {
+					public void windowClosing(WindowEvent we) {
+						System.exit(0);
+					}
+				});
+				f.setVisible(true);
+				
+				Container content = f.getContentPane();
 				content.setLayout(new BorderLayout());
 
 				buttonPanel = new JPanel();
-				gridPanel = new JPanel(new GridLayout(10, 2));
+				gridPanel = new JPanel(new GridLayout(12, 2));
 				actionPanel = new JPanel();
 				
 				stockIDLabel = new JLabel("ID:", SwingConstants.LEFT);
@@ -409,12 +474,14 @@ public class Menu extends JFrame {
 				stockPriceLabel = new JLabel("Price:", SwingConstants.LEFT);
 				stockCategoryLabel = new JLabel("Category:", SwingConstants.LEFT);
 				stockManufacturerLabel = new JLabel("Manufacturer", SwingConstants.LEFT);
+				stockQuantityLabel = new JLabel("Quantity", SwingConstants.LEFT);
 				
 				stockIDText = new JTextField(20);
 				stockNameText = new JTextField(20);
 				stockPriceText = new JTextField(20);
 				stockCategoryText = new JTextField(20);
 				stockManufacturerText = new JTextField(20);
+				stockQuantityText = new JTextField(20);
 				
 				first = new JButton("First");
 				previous = new JButton("Previous");
@@ -432,6 +499,7 @@ public class Menu extends JFrame {
 				stockPriceText.setEditable(false);
 				stockCategoryText.setEditable(false);
 				stockManufacturerText.setEditable(false);
+				stockQuantityText.setEditable(false);
 				
 				gridPanel.add(stockIDLabel);
 				gridPanel.add(stockIDText);
@@ -443,6 +511,8 @@ public class Menu extends JFrame {
 				gridPanel.add(stockCategoryText);
 				gridPanel.add(stockManufacturerLabel);
 				gridPanel.add(stockManufacturerText);
+				gridPanel.add(stockQuantityLabel);
+				gridPanel.add(stockQuantityText);
 				
 				buttonPanel.add(first);
 				buttonPanel.add(previous);
@@ -530,7 +600,7 @@ public class Menu extends JFrame {
 
 				cancel.addActionListener(new ActionListener() {
 					public void actionPerformed(ActionEvent ae) {
-						dispose();
+						f.dispose();
 						admin();
 					}
 				});
@@ -550,7 +620,7 @@ public class Menu extends JFrame {
 		
 		searchCustomersButton.addActionListener(new ActionListener() {
 			public void actionPerformed(ActionEvent ae) {
-
+				
 			}
 		});
 		
@@ -561,12 +631,24 @@ public class Menu extends JFrame {
 				customerList = customerDAO.getAllCustomers();
 				f.dispose();
 				
-				JButton first, previous, next, last, cancel, edit, save;
+				f = new JFrame("Add New Stock Item");
+				f.setSize(400, 400);
+				f.setLocation(200, 200);
+				f.addWindowListener(new WindowAdapter() {
+					public void windowClosing(WindowEvent we) {
+						System.exit(0);
+					}
+				});
+				f.setVisible(true);
+				
+				Container customerContent = f.getContentPane();
+
+				customerContent.setLayout(new BorderLayout());
+				
+				JButton firstCustomer, previousCustomer, nextCustomer, lastCustomer, cancelCustomer;
 				JPanel gridPanel, buttonPanel, actionPanel;
 
-				Container content = getContentPane();
-
-				content.setLayout(new BorderLayout());
+				
 
 				buttonPanel = new JPanel();
 				gridPanel = new JPanel(new GridLayout(8, 2));
@@ -583,13 +665,13 @@ public class Menu extends JFrame {
 				surnameText = new JTextField(20);
 				addressText = new JTextField(20);
 	
-				first = new JButton("First");
-				previous = new JButton("Previous");
-				next = new JButton("Next");
-				last = new JButton("Last");
+				firstCustomer = new JButton("First");
+				previousCustomer = new JButton("Previous");
+				nextCustomer = new JButton("Next");
+				lastCustomer = new JButton("Last");
 				
 
-				cancel = new JButton("Cancel");
+				cancelCustomer = new JButton("Cancel");
 
 				displayCustomerInfo(customerList, 0);
 				
@@ -609,25 +691,25 @@ public class Menu extends JFrame {
 				gridPanel.add(addressText);
 
 				
-				buttonPanel.add(first);
-				buttonPanel.add(previous);
-				buttonPanel.add(next);
-				buttonPanel.add(last);
+				buttonPanel.add(firstCustomer);
+				buttonPanel.add(previousCustomer);
+				buttonPanel.add(nextCustomer);
+				buttonPanel.add(lastCustomer);
 
-				actionPanel.add(cancel);
+				actionPanel.add(cancelCustomer);
 				
 				
-				content.add(gridPanel, BorderLayout.NORTH);
-				content.add(buttonPanel, BorderLayout.CENTER);
-				content.add(actionPanel, BorderLayout.AFTER_LAST_LINE);
-				first.addActionListener(new ActionListener() {
+				customerContent.add(gridPanel, BorderLayout.NORTH);
+				customerContent.add(buttonPanel, BorderLayout.CENTER);
+				customerContent.add(actionPanel, BorderLayout.AFTER_LAST_LINE);
+				firstCustomer.addActionListener(new ActionListener() {
 					public void actionPerformed(ActionEvent ae) {
 						position = 0;
 						displayCustomerInfo(customerList, position);
 					}
 				});
 				
-				previous.addActionListener(new ActionListener() {
+				previousCustomer.addActionListener(new ActionListener() {
 					public void actionPerformed(ActionEvent ae) {
 
 						if (position < 1) {
@@ -640,7 +722,7 @@ public class Menu extends JFrame {
 					}
 				});
 
-				next.addActionListener(new ActionListener() {
+				nextCustomer.addActionListener(new ActionListener() {
 					public void actionPerformed(ActionEvent ae) {
 
 						if (position == stockList.size() - 1) {
@@ -654,7 +736,7 @@ public class Menu extends JFrame {
 					}
 				});
 
-				last.addActionListener(new ActionListener() {
+				lastCustomer.addActionListener(new ActionListener() {
 					public void actionPerformed(ActionEvent ae) {
 
 						position = stockList.size() - 1;
@@ -665,13 +747,13 @@ public class Menu extends JFrame {
 				
 
 
-				cancel.addActionListener(new ActionListener() {
+				cancelCustomer.addActionListener(new ActionListener() {
 					public void actionPerformed(ActionEvent ae) {
-						dispose();
+						f.dispose();
 						admin();
 					}
 				});
-				setContentPane(content);
+				setContentPane(customerContent);
 				setSize(400, 300);
 				setVisible(true);
 			
@@ -690,12 +772,52 @@ public class Menu extends JFrame {
 		});
 	}
 	
+	public void customer(Customer aCustomer) {
+		
+		f.dispose();
+
+		f = new JFrame("Customer Menu");
+		f.setSize(400, 300);
+		f.setLocation(200, 200);
+		f.addWindowListener(new WindowAdapter() {
+			public void windowClosing(WindowEvent we) {
+				System.exit(0);
+			}
+		});
+		f.setVisible(true);
+
+		JPanel viewStockPanel = new JPanel(new FlowLayout(FlowLayout.LEFT));
+		JButton viewStockButton = new JButton("View All Products");
+		viewStockButton.setPreferredSize(new Dimension(250, 20));
+		viewStockPanel.add(viewStockButton);
+
+		JPanel searchStockPanel = new JPanel(new FlowLayout(FlowLayout.LEFT));
+		JButton searchStockButton = new JButton("Search For a Product");
+		searchStockButton.setPreferredSize(new Dimension(250, 20));
+		searchStockPanel.add(searchStockButton);
+
+		JPanel returnPanel = new JPanel(new FlowLayout(FlowLayout.RIGHT));
+		JButton returnButton = new JButton("Exit Customer Menu");
+		returnPanel.add(returnButton);
+
+		JLabel optionLabel = new JLabel("Please select an option");
+
+		content = f.getContentPane();
+		content.setLayout(new GridLayout(4, 1));
+		content.add(optionLabel);
+		content.add(viewStockPanel);
+		content.add(searchStockPanel);
+		content.add(returnPanel);
+		
+	}
+	
 	public void displayStockInfo(ArrayList<StockItem> stockList, int position) {
 		stockIDText.setText(String.valueOf(stockList.get(position).getStockItemID()));
 		stockNameText.setText(stockList.get(position).getTitle());
 		stockPriceText.setText(String.valueOf(stockList.get(position).getPrice()));
 		stockCategoryText.setText(stockList.get(position).getCategory());
 		stockManufacturerText.setText(stockList.get(position).getManufacturer());
+		stockQuantityText.setText(String.valueOf(stockList.get(position).getQuanitity()));
 		
 	}
 	

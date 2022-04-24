@@ -8,6 +8,7 @@ import javax.persistence.Persistence;
 
 import entities.Customer;
 
+
 public class CustomerDAO {
 	
 	private static EntityManagerFactory emf = 
@@ -35,5 +36,17 @@ public class CustomerDAO {
         em.close();
         return list;
 		
+	}
+	
+	public Customer getSingleCustomer(int customerID) {
+		EntityManager em = emf.createEntityManager();
+        em.getTransaction().begin();
+        Customer managedEntity = em.createQuery("SELECT c FROM Customer c WHERE c.customerID = :customerID",
+        					Customer.class).setParameter("customerID", customerID).getSingleResult();
+        em.flush();
+        em.getTransaction().commit();
+       
+        em.close();
+        return managedEntity;
 	}
 }
