@@ -360,10 +360,9 @@ public class Menu extends JFrame {
 		content.add(addStockPanel);
 		content.add(searchCustomersPanel);
 		content.add(viewCustomersPanel);
-		
-		// content.add(deleteAccountPanel);
 		content.add(returnPanel);
 		
+		//Admin can add new Stock Item to the DB
 		newStockButton.addActionListener(new ActionListener() {
 			public void actionPerformed(ActionEvent ae) {
 				f.dispose();
@@ -442,6 +441,10 @@ public class Menu extends JFrame {
 			}
 		});
 		
+		
+		//Admin can view all stock items in the DB
+		//Can click edit which will allow current item to be edited
+		//Once Save is clicked, updates will be written to DB
 		viewStockButton.addActionListener(new ActionListener() {
 			public void actionPerformed(ActionEvent ae) {
 				StockDAO stockDAO = new StockDAO();
@@ -661,6 +664,7 @@ public class Menu extends JFrame {
 			}
 		});
 		
+		//Admin can view all customers in DB
 		viewCustomersButton.addActionListener(new ActionListener() {
 			public void actionPerformed(ActionEvent ae) {
 				
@@ -668,7 +672,7 @@ public class Menu extends JFrame {
 				customerList = customerDAO.getAllCustomers();
 				f.dispose();
 				
-				f = new JFrame("Add New Stock Item");
+				f = new JFrame("View All Customers");
 				f.setSize(400, 400);
 				f.setLocation(200, 200);
 				f.addWindowListener(new WindowAdapter() {
@@ -845,6 +849,149 @@ public class Menu extends JFrame {
 		content.add(viewStockPanel);
 		content.add(searchStockPanel);
 		content.add(returnPanel);
+		
+		viewStockButton.addActionListener(new ActionListener() {
+			public void actionPerformed(ActionEvent ae) {
+				StockDAO stockDAO = new StockDAO();
+				
+				stockList = stockDAO.getAllItems();
+				f.dispose();
+				
+				JButton first, previous, next, last, cancel;
+				JPanel gridPanel, buttonPanel, actionPanel;
+
+				f = new JFrame("View All Stock");
+				f.setSize(400, 400);
+				f.setLocation(200, 200);
+				f.addWindowListener(new WindowAdapter() {
+					public void windowClosing(WindowEvent we) {
+						System.exit(0);
+					}
+				});
+				f.setVisible(true);
+				
+				Container content = f.getContentPane();
+				content.setLayout(new BorderLayout());
+
+				buttonPanel = new JPanel();
+				gridPanel = new JPanel(new GridLayout(12, 2));
+				actionPanel = new JPanel();
+				
+				stockIDLabel = new JLabel("ID:", SwingConstants.LEFT);
+				stockNameLabel = new JLabel("Title:", SwingConstants.LEFT);
+				stockPriceLabel = new JLabel("Price:", SwingConstants.LEFT);
+				stockCategoryLabel = new JLabel("Category:", SwingConstants.LEFT);
+				stockManufacturerLabel = new JLabel("Manufacturer", SwingConstants.LEFT);
+				stockQuantityLabel = new JLabel("Quantity", SwingConstants.LEFT);
+				
+				stockIDText = new JTextField(20);
+				stockNameText = new JTextField(20);
+				stockPriceText = new JTextField(20);
+				stockCategoryText = new JTextField(20);
+				stockManufacturerText = new JTextField(20);
+				stockQuantityText = new JTextField(20);
+				
+				first = new JButton("First");
+				previous = new JButton("Previous");
+				next = new JButton("Next");
+				last = new JButton("Last");
+				
+				
+				
+				cancel = new JButton("Cancel");
+
+				displayStockInfo(stockList,0);
+				
+				stockIDText.setEditable(false);
+				stockNameText.setEditable(false);
+				stockPriceText.setEditable(false);
+				stockCategoryText.setEditable(false);
+				stockManufacturerText.setEditable(false);
+				stockQuantityText.setEditable(false);
+				
+				gridPanel.add(stockIDLabel);
+				gridPanel.add(stockIDText);
+				gridPanel.add(stockNameLabel);
+				gridPanel.add(stockNameText);
+				gridPanel.add(stockPriceLabel);
+				gridPanel.add(stockPriceText);
+				gridPanel.add(stockCategoryLabel);
+				gridPanel.add(stockCategoryText);
+				gridPanel.add(stockManufacturerLabel);
+				gridPanel.add(stockManufacturerText);
+				gridPanel.add(stockQuantityLabel);
+				gridPanel.add(stockQuantityText);
+				
+				buttonPanel.add(first);
+				buttonPanel.add(previous);
+				buttonPanel.add(next);
+				buttonPanel.add(last);
+
+
+				actionPanel.add(cancel);
+				
+				
+				content.add(gridPanel, BorderLayout.NORTH);
+				content.add(buttonPanel, BorderLayout.CENTER);
+				content.add(actionPanel, BorderLayout.AFTER_LAST_LINE);
+				first.addActionListener(new ActionListener() {
+					public void actionPerformed(ActionEvent ae) {
+						position = 0;
+						displayStockInfo(stockList, position);
+					}
+				});
+				
+				previous.addActionListener(new ActionListener() {
+					public void actionPerformed(ActionEvent ae) {
+
+						if (position < 1) {
+							// don't do anything
+						} else {
+							position = position - 1;
+
+							displayStockInfo(stockList, position);
+						}
+					}
+				});
+
+				next.addActionListener(new ActionListener() {
+					public void actionPerformed(ActionEvent ae) {
+
+						if (position == stockList.size() - 1) {
+							// don't do anything
+						} else {
+							position = position + 1;
+
+							displayStockInfo(stockList, position);
+						}
+
+					}
+				});
+
+				last.addActionListener(new ActionListener() {
+					public void actionPerformed(ActionEvent ae) {
+
+						position = stockList.size() - 1;
+
+						displayStockInfo(stockList, position);
+					}
+				});
+				
+				
+
+				cancel.addActionListener(new ActionListener() {
+					public void actionPerformed(ActionEvent ae) {
+						f.dispose();
+						customer(aCustomer);
+					}
+				});
+				setContentPane(content);
+				setSize(400, 300);
+				setVisible(true);
+			}
+				
+			
+		});
 		
 	}
 	
