@@ -2,9 +2,9 @@ package entities;
 
 public class SellStock implements Order{
 
-	private StockItem stockItem;
+	private StockTransactionControl stockItem;
 	
-	public SellStock(StockItem stockItem) {
+	public SellStock(StockTransactionControl stockItem) {
 		this.stockItem = stockItem;
 	}
 	

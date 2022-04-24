@@ -2,9 +2,9 @@ package entities;
 
 public class BuyStock implements Order{
 
-	private StockItem stockItem;
+	private StockTransactionControl stockItem;
 	
-	public BuyStock (StockItem stockItem) {
+	public BuyStock (StockTransactionControl stockItem) {
 		this.stockItem = stockItem;
 	}
 	@Override

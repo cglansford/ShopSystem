@@ -488,6 +488,7 @@ public class Menu extends JFrame {
 				next = new JButton("Next");
 				last = new JButton("Last");
 				
+				
 				edit = new JButton("Edit Item");
 				save = new JButton("Save");
 				cancel = new JButton("Cancel");
@@ -612,8 +613,44 @@ public class Menu extends JFrame {
 			
 		});
 		
+		//Admin buys stock
+		//Specifies the stockID for product and how much they wish to buy then executes order
 		addStockButton.addActionListener(new ActionListener() {
 			public void actionPerformed(ActionEvent ae) {
+				boolean stockItemNotFound = true;
+				StockItem aStockItem = null;
+				StockDAO stockDAO = new StockDAO();
+				//Looking for Stock Item in DB
+				while (stockItemNotFound) {
+					String stockItemID = JOptionPane.showInputDialog(f, "Enter Stock ID:");
+
+					aStockItem = stockDAO.getSingleStock(Integer.parseInt(stockItemID));
+
+					if (aStockItem == null) {
+						int reply = JOptionPane.showConfirmDialog(null, null, "Stock Item not found. Try again?",
+								JOptionPane.YES_NO_OPTION);
+						if (reply == JOptionPane.YES_OPTION) {
+							stockItemNotFound = true;
+						} else if (reply == JOptionPane.NO_OPTION) {
+							f.dispose();
+							stockItemNotFound = false;
+							
+							menuStart();
+						}
+					} else {
+						stockItemNotFound = false;
+					}
+
+				}
+
+					
+					String buyQuantity = JOptionPane.showInputDialog(f, "Enter How Much Stock To Buy");
+					
+					//Creates order and executes to DB
+					BuyStock buyStockOrder = new BuyStock(new StockTransactionControl(aStockItem.getStockItemID(), Integer.parseInt(buyQuantity)));
+					OrderSystem os = new OrderSystem();
+					os.createOrder(buyStockOrder);
+					os.executeOrder();
 				
 			}
 		});
@@ -817,7 +854,7 @@ public class Menu extends JFrame {
 		stockPriceText.setText(String.valueOf(stockList.get(position).getPrice()));
 		stockCategoryText.setText(stockList.get(position).getCategory());
 		stockManufacturerText.setText(stockList.get(position).getManufacturer());
-		stockQuantityText.setText(String.valueOf(stockList.get(position).getQuanitity()));
+		stockQuantityText.setText(String.valueOf(stockList.get(position).getQuantity()));
 		
 	}
 	

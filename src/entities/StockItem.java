@@ -5,6 +5,8 @@ import javax.persistence.GeneratedValue;
 import javax.persistence.GenerationType;
 import javax.persistence.Id;
 
+import DAOs.StockDAO;
+
 @Entity
 public class StockItem {
 
@@ -15,7 +17,7 @@ public class StockItem {
 	private String manufacturer;
 	private int price;
 	private String category;
-	private int quanitity;
+	private int quantity;
 	//Associated image
 	
 	public StockItem() {
@@ -27,7 +29,7 @@ public class StockItem {
 		this.manufacturer = manufacturer;
 		this.price = price;
 		this.category = category;
-		this.quanitity = 10;
+		this.quantity = 10;
 	}
 	
 	
@@ -65,20 +67,20 @@ public class StockItem {
 		this.stockItemID = stockItemID;
 	}
 
-	public int getQuanitity() {
-		return quanitity;
+	public int getQuantity() {
+		return quantity;
 	}
 
-	public void setQuanitity(int quanitity) {
-		this.quanitity = quanitity;
+	public void setQuantity(int quantity) {
+		this.quantity = quantity;
 	}
 	
-	public void buyStock() {
-		
+	public void buyStock(int quantity) {
+		this.quantity += quantity;
 	}
 	
-	public void sellStock() {
-		
+	public void sellStock(int quantity) {
+		this.quantity -= quantity;
 	}
 	
 }
