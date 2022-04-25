@@ -10,6 +10,9 @@ public class BuyStock implements Order{
 	@Override
 	public void execute() {
 		stockItem.buyStock();
+		
 	}
+	
+	
 
 }

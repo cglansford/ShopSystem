@@ -13,8 +13,14 @@ public class OrderSystem {
 	public void executeOrder() {
 		for(Order order : allOrders) {
 			order.execute();
+			
 		}
 		allOrders.clear();
 	}
+	
+	public void executeSingleOrder(Order order) {
+		order.execute();
+	}
+	
 
 }
