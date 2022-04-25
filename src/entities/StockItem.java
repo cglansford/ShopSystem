@@ -24,12 +24,12 @@ public class StockItem {
 		
 	}
 	
-	public StockItem(String title, int price, String category, String manufacturer) {
+	public StockItem(String title, int price, String category, String manufacturer, int quantity) {
 		this.title = title;
 		this.manufacturer = manufacturer;
 		this.price = price;
 		this.category = category;
-		this.quantity = 10;
+		this.quantity = quantity;
 	}
 	
 	

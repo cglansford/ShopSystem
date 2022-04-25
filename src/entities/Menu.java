@@ -6,6 +6,7 @@ import java.util.ArrayList;
 import javax.swing.*;
 import DAOs.CustomerDAO;
 import DAOs.StockDAO;
+import DAOs.TransactionHistoryDAO;
 
 public class Menu extends JFrame {
 
@@ -15,6 +16,7 @@ public class Menu extends JFrame {
 	private int position = 0;
 	private String password;
 	OrderSystem os = new OrderSystem();
+	StockDAO stockDAO = new StockDAO();
 
 	JFrame f, f1;
 
@@ -140,9 +142,11 @@ public class Menu extends JFrame {
 
 									CustomerDAO customerDAO = new CustomerDAO();
 									customerDAO.persistObject(new Customer(firstName, surname, address, password));
+									
+									Customer aCustomer = customerDAO.getRecentCustomer(firstName, surname);
 
 									JOptionPane.showMessageDialog(f,
-											"CustomerID = " + CustomerID + "\n Password = " + password,
+											"CustomerID = " + aCustomer.getCustomerID() + "\n Password = " + password,
 											"Customer created.", JOptionPane.INFORMATION_MESSAGE);
 									f.dispose();
 									menuStart();
@@ -390,10 +394,12 @@ public class Menu extends JFrame {
 
 						add.addActionListener(new ActionListener() {
 							public void actionPerformed(ActionEvent e) {
-								StockDAO stockDAO = new StockDAO();
+								//StockDAO stockDAO = new StockDAO();
 
 								stockDAO.persistObject(
-										new StockItem(stockName, stockPrice, stockCategory, stockManufacturer));
+										new StockItem(stockName, stockPrice, stockCategory, stockManufacturer, 10));
+								f.dispose();
+								admin();
 							}
 						});
 					}
@@ -422,7 +428,7 @@ public class Menu extends JFrame {
 		// Once Save is clicked, updates will be written to DB
 		viewStockButton.addActionListener(new ActionListener() {
 			public void actionPerformed(ActionEvent ae) {
-				StockDAO stockDAO = new StockDAO();
+				//StockDAO stockDAO = new StockDAO();
 
 				stockList = stockDAO.getAllItems();
 				f.dispose();
@@ -446,7 +452,7 @@ public class Menu extends JFrame {
 				buttonPanel = new JPanel();
 				gridPanel = new JPanel(new GridLayout(12, 2));
 				actionPanel = new JPanel();
-
+				position = 0;
 				stockIDLabel = new JLabel("ID:", SwingConstants.LEFT);
 				stockNameLabel = new JLabel("Title:", SwingConstants.LEFT);
 				stockPriceLabel = new JLabel("Price:", SwingConstants.LEFT);
@@ -595,7 +601,7 @@ public class Menu extends JFrame {
 			public void actionPerformed(ActionEvent ae) {
 				boolean stockItemNotFound = true;
 				StockItem aStockItem = null;
-				StockDAO stockDAO = new StockDAO();
+				//StockDAO stockDAO = new StockDAO();
 				// Looking for Stock Item in DB
 				while (stockItemNotFound) {
 					String stockName = JOptionPane.showInputDialog(f, "Enter Stock Name:");
@@ -682,7 +688,7 @@ public class Menu extends JFrame {
 				addressText = new JTextField(20);
 
 				cancelCustomer = new JButton("Cancel");
-
+				position = 0;
 				customerIDText.setEditable(false);
 				firstNameText.setEditable(false);
 				surnameText.setEditable(false);
@@ -766,7 +772,7 @@ public class Menu extends JFrame {
 				lastCustomer = new JButton("Last");
 
 				cancelCustomer = new JButton("Cancel");
-
+				position = 0;
 				displayCustomerInfo(customerList, 0);
 
 				customerIDText.setEditable(false);
@@ -816,7 +822,7 @@ public class Menu extends JFrame {
 				nextCustomer.addActionListener(new ActionListener() {
 					public void actionPerformed(ActionEvent ae) {
 
-						if (position == stockList.size() - 1) {
+						if (position == customerList.size() - 1) {
 							// don't do anything
 						} else {
 							position = position + 1;
@@ -830,7 +836,7 @@ public class Menu extends JFrame {
 				lastCustomer.addActionListener(new ActionListener() {
 					public void actionPerformed(ActionEvent ae) {
 
-						position = stockList.size() - 1;
+						position = customerList.size() - 1;
 
 						displayCustomerInfo(customerList, position);
 					}
@@ -908,7 +914,7 @@ public class Menu extends JFrame {
 
 		viewStockButton.addActionListener(new ActionListener() {
 			public void actionPerformed(ActionEvent ae) {
-				StockDAO stockDAO = new StockDAO();
+				//StockDAO stockDAO = new StockDAO();
 
 				stockList = stockDAO.getAllItems();
 				f.dispose();
@@ -954,8 +960,8 @@ public class Menu extends JFrame {
 
 				buyNow = new JButton("Buy Now");
 				addToCart = new JButton("Add To Cart");
-				cancel = new JButton("Cancel");
-
+				cancel = new JButton("Exit");
+				position = 0;
 				displayStockInfo(stockList, 0);
 
 				stockIDText.setEditable(false);
@@ -989,7 +995,7 @@ public class Menu extends JFrame {
 				content.add(gridPanel, BorderLayout.NORTH);
 				content.add(buttonPanel, BorderLayout.CENTER);
 				content.add(actionPanel, BorderLayout.AFTER_LAST_LINE);
-				
+
 				first.addActionListener(new ActionListener() {
 					public void actionPerformed(ActionEvent ae) {
 						position = 0;
@@ -1032,10 +1038,11 @@ public class Menu extends JFrame {
 						displayStockInfo(stockList, position);
 					}
 				});
-				
+
 				buyNow.addActionListener(new ActionListener() {
 					public void actionPerformed(ActionEvent ae) {
 						String quantity = JOptionPane.showInputDialog(f, "How Many Do You Want To Buy:");
+						
 						SellStock sellStockOrder = new SellStock(new StockTransactionControl(aCustomer.getCustomerID(),
 								aStockItem.getStockItemID(), Integer.parseInt(quantity), aStockItem.getPrice()));
 
@@ -1044,10 +1051,11 @@ public class Menu extends JFrame {
 
 					}
 				});
-				
+
 				addToCart.addActionListener(new ActionListener() {
 					public void actionPerformed(ActionEvent ae) {
 						String quantity = JOptionPane.showInputDialog(f, "How Many Do You Want To Add To Cart:");
+						aStockItem = stockDAO.getSingleStock(Integer.valueOf(stockIDText.getText()));
 						StockTransactionControl order = new StockTransactionControl(aCustomer.getCustomerID(),
 								aStockItem.getStockItemID(), Integer.parseInt(quantity), aStockItem.getPrice());
 						SellStock sellStockOrder = new SellStock(order);
@@ -1077,7 +1085,7 @@ public class Menu extends JFrame {
 			public void actionPerformed(ActionEvent ae) {
 				boolean stockItemNotFound = true;
 
-				StockDAO stockDAO = new StockDAO();
+				//StockDAO stockDAO = new StockDAO();
 				// Looking for Stock Item in DB
 				while (stockItemNotFound) {
 					String stockName = JOptionPane.showInputDialog(f, "Enter Stock Name:");
@@ -1135,7 +1143,9 @@ public class Menu extends JFrame {
 				stockCategoryText = new JTextField(20);
 				stockManufacturerText = new JTextField(20);
 				stockQuantityText = new JTextField(20);
-
+				
+				position = 0;
+				
 				stockIDText.setText(String.valueOf(aStockItem.getStockItemID()));
 				stockNameText.setText(aStockItem.getTitle());
 				stockPriceText.setText(String.valueOf(aStockItem.getPrice()));
@@ -1143,7 +1153,7 @@ public class Menu extends JFrame {
 				stockManufacturerText.setText(aStockItem.getManufacturer());
 				stockQuantityText.setText(String.valueOf(aStockItem.getQuantity()));
 
-				cancel = new JButton("Cancel");
+				cancel = new JButton("Exit");
 				buyNow = new JButton("Buy Product Now");
 				addToCart = new JButton("Add To Cart");
 
@@ -1249,13 +1259,13 @@ public class Menu extends JFrame {
 
 					totalPriceLabel = new JLabel("Total Cart Cost:", SwingConstants.LEFT);
 					totalPriceText = new JTextField(5);
-
+					
 					displayCartInfo(cartList, 0);
 					first = new JButton("First");
 					previous = new JButton("Previous");
 					next = new JButton("Next");
 					last = new JButton("Last");
-					cancel = new JButton("Cancel");
+					cancel = new JButton("Exit Cart");
 					buyNow = new JButton("Confirm Purchase");
 
 					gridPanel.add(stockIDLabel);
@@ -1312,7 +1322,7 @@ public class Menu extends JFrame {
 					next.addActionListener(new ActionListener() {
 						public void actionPerformed(ActionEvent ae) {
 
-							if (position == stockList.size() - 1) {
+							if (position == cartList.size() - 1) {
 								// don't do anything
 							} else {
 								position = position + 1;
@@ -1326,7 +1336,7 @@ public class Menu extends JFrame {
 					last.addActionListener(new ActionListener() {
 						public void actionPerformed(ActionEvent ae) {
 
-							position = stockList.size() - 1;
+							position = cartList.size() - 1;
 
 							displayCartInfo(cartList, position);
 						}
@@ -1356,21 +1366,152 @@ public class Menu extends JFrame {
 							customer(aCustomer);
 						}
 					});
-				}else {
+				} else {
 					int reply = JOptionPane.showConfirmDialog(null, "Empty Cart: Return to Menu", "Warning",
 							JOptionPane.OK_OPTION);
-					
+
 					if (reply == JOptionPane.OK_OPTION) {
 						customer(aCustomer);
-						}
+					}
 				}
 
 			}
 
 		});
 
-		
-		
+		purchaseHistoryButton.addActionListener(new ActionListener() {
+			public void actionPerformed(ActionEvent ae) {
+				f.dispose();
+
+				
+				
+
+				TransactionHistoryDAO thDAO = new TransactionHistoryDAO();
+				ArrayList<TransactionHistory> thHistoryList = thDAO.getUserHistory(aCustomer.getCustomerID());
+
+				if (thHistoryList.size() > 0) {
+					f.dispose();
+
+					JButton cancel, first, last, next, previous;
+					JPanel gridPanel, actionPanel, buttonPanel;
+
+					f = new JFrame("Transaction History");
+					f.setSize(400, 400);
+					f.setLocation(200, 200);
+					f.addWindowListener(new WindowAdapter() {
+						public void windowClosing(WindowEvent we) {
+							System.exit(0);
+						}
+					});
+					f.setVisible(true);
+
+					Container content = f.getContentPane();
+					content.setLayout(new BorderLayout());
+
+					buttonPanel = new JPanel();
+					gridPanel = new JPanel(new GridLayout(12, 2));
+					actionPanel = new JPanel();
+
+					stockIDLabel = new JLabel("Stock ID:", SwingConstants.LEFT);
+					stockNameLabel = new JLabel("Title:", SwingConstants.LEFT);
+					stockPriceLabel = new JLabel("Price:", SwingConstants.LEFT);
+					stockQuantityLabel = new JLabel("Quantity", SwingConstants.LEFT);
+
+					stockIDText = new JTextField(20);
+					stockNameText = new JTextField(20);
+					stockPriceText = new JTextField(20);
+					stockQuantityText = new JTextField(20);
+					
+				
+					displayPurchaseHistory(thHistoryList, 0);
+
+					first = new JButton("First");
+					previous = new JButton("Previous");
+					next = new JButton("Next");
+					last = new JButton("Last");
+					cancel = new JButton("Cancel");
+
+					gridPanel.add(stockIDLabel);
+					gridPanel.add(stockIDText);
+					gridPanel.add(stockNameLabel);
+					gridPanel.add(stockNameText);
+					gridPanel.add(stockPriceLabel);
+					gridPanel.add(stockPriceText);
+					gridPanel.add(stockQuantityLabel);
+					gridPanel.add(stockQuantityText);
+
+					buttonPanel.add(first);
+					buttonPanel.add(previous);
+					buttonPanel.add(next);
+					buttonPanel.add(last);
+
+					actionPanel.add(cancel);
+
+					content.add(gridPanel, BorderLayout.NORTH);
+					content.add(buttonPanel, BorderLayout.CENTER);
+					content.add(actionPanel, BorderLayout.AFTER_LAST_LINE);
+
+					first.addActionListener(new ActionListener() {
+						public void actionPerformed(ActionEvent ae) {
+							position = 0;
+							displayPurchaseHistory(thHistoryList, position);
+						}
+					});
+
+					previous.addActionListener(new ActionListener() {
+						public void actionPerformed(ActionEvent ae) {
+
+							if (position < 1) {
+								// don't do anything
+							} else {
+								position = position - 1;
+
+								displayPurchaseHistory(thHistoryList, position);
+							}
+						}
+					});
+
+					next.addActionListener(new ActionListener() {
+						public void actionPerformed(ActionEvent ae) {
+
+							if (position == thHistoryList.size() - 1) {
+								// don't do anything
+							} else {
+								position = position + 1;
+
+								displayPurchaseHistory(thHistoryList, position);
+							}
+
+						}
+					});
+
+					last.addActionListener(new ActionListener() {
+						public void actionPerformed(ActionEvent ae) {
+
+							position = thHistoryList.size() - 1;
+
+							displayPurchaseHistory(thHistoryList, position);
+						}
+					});
+
+					cancel.addActionListener(new ActionListener() {
+						public void actionPerformed(ActionEvent ae) {
+							f.dispose();
+							customer(aCustomer);
+						}
+					});
+				} else {
+					int reply = JOptionPane.showConfirmDialog(null, "No Transactions, Return To Menu", "Warning",
+							JOptionPane.OK_OPTION);
+
+					if (reply == JOptionPane.OK_OPTION) {
+						customer(aCustomer);
+					}
+				}
+
+			}
+		});
+
 		returnButton.addActionListener(new ActionListener() {
 			public void actionPerformed(ActionEvent ae) {
 				f.dispose();
@@ -1398,9 +1539,23 @@ public class Menu extends JFrame {
 
 	public void displayCartInfo(ArrayList<StockTransactionControl> cartList, int position) {
 		
+		aStockItem = stockDAO.getSingleStock(cartList.get(position).getStockItemID());
+		
 		stockIDText.setText(String.valueOf(cartList.get(position).getStockItemID()));
 		stockPriceText.setText(String.valueOf(cartList.get(position).getPrice()));
+		stockNameText.setText(aStockItem.getTitle());
+		stockPriceText.setText(String.valueOf(aStockItem.getPrice()));
 		stockQuantityText.setText(String.valueOf(cartList.get(position).getQuantity()));
+	}
+
+	public void displayPurchaseHistory(ArrayList<TransactionHistory> thList, int position) {
+		
+		aStockItem = stockDAO.getSingleStock(thList.get(position).getStockID());
+		
+		stockIDText.setText(String.valueOf(thList.get(position).getStockID()));
+		stockNameText.setText(aStockItem.getTitle());
+		stockPriceText.setText(String.valueOf(aStockItem.getPrice()));
+		stockQuantityText.setText(String.valueOf(thList.get(position).getQuantity()));
 	}
 
 }
